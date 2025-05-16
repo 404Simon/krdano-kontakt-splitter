@@ -1,6 +1,9 @@
 <div class="p-4 space-y-4 mx-4 md:mx-30 my-10">
-    <x-input class="text-black" label="Unstructured Input" hint="Insert your unstructured input"
-        wire:model.live="unstructured" wire:keyup.enter="updatedUnstructured" />
+    <form wire:submit="submit">
+        <x-input class="text-black" label="Unstructured Input" hint="Insert your unstructured input"
+            wire:model.defer="unstructured" />
+        <x-button type="submit">Submit</x-button>
+    </form>
 
     @isset($structured)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -23,14 +26,14 @@
                     </div>
                 @endisset
                 @isset($structured['firstname'])
-                <div class="text-gray-700 dark:text-gray-200">
-                    Vorname: <span class="font-semibold">{{ $structured['firstname'] }}</span>
-                </div>
+                    <div class="text-gray-700 dark:text-gray-200">
+                        Vorname: <span class="font-semibold">{{ $structured['firstname'] }}</span>
+                    </div>
                 @endisset
                 @isset($structured['lastname'])
-                <div class="text-gray-700 dark:text-gray-200">
-                    Nachname: <span class="font-semibold">{{ $structured['lastname'] }}</span>
-                </div>
+                    <div class="text-gray-700 dark:text-gray-200">
+                        Nachname: <span class="font-semibold">{{ $structured['lastname'] }}</span>
+                    </div>
                 @endisset
                 @isset($structured['language'])
                     <div class="text-gray-700 dark:text-gray-200">
@@ -45,7 +48,12 @@
                 <div class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ $structured['letter_salutation'] ?? '–' }}</div>
             </div>
-
+            <x-button wire:click="save" type="button">Speichern</x-button>
+            @if (session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
         </div>
     @endisset
 </div>

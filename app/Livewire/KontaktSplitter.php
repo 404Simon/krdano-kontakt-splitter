@@ -45,7 +45,7 @@ class KontaktSplitter extends Component
             $response = Prism::structured()
                 ->using(Provider::OpenAI, 'gpt-4o-mini')
                 ->withSchema($schema)
-                ->withPrompt('Du bist Informatikexperte. Analysiere die gegebene Frage und bestimme alle relevanten Teilgebiete der Informatik.\nFrage: '.$input)
+                ->withPrompt($input)
                 ->asStructured();
 
             $structuredResponse = $response->structured;
@@ -58,7 +58,7 @@ class KontaktSplitter extends Component
         }
     }
 
-    public function updatedUnstructured(): void
+    public function submit(): void
     {
         $this->validateOnly('unstructured');
         try {
@@ -66,5 +66,18 @@ class KontaktSplitter extends Component
         } catch (Exception $th) {
             $this->structured = null;
         }
+    }
+
+    public function save(): void
+    {
+        if (! $this->structured) {
+            return;
+        }
+
+        auth()->user()
+            ->savedInputs()
+            ->create($this->structured);
+
+        session()->flash('status', 'Briefanrede wurde gespeichert!');
     }
 }

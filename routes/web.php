@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\KontaktSplitter;
+use App\Livewire\SavedInputs;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -8,13 +9,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('splitter', KontaktSplitter::class)
-    ->name('splitter')
-    ->middleware(['auth', 'verified']);
-
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('splitter', KontaktSplitter::class)->name('splitter');
+    Route::get('saved', SavedInputs::class)->name('saved');
     Route::redirect('settings', 'settings/profile');
-
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
