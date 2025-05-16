@@ -37,7 +37,6 @@ class KontaktSplitter extends Component
                 new StringSchema('firstname', 'firstname(s)', true),
                 new StringSchema('lastname', 'lastname, if there are multiple lastnames, concat them with -', true),
                 new StringSchema('language', 'estimate the language based on the name (e.g. DE, FR, RU), leave null if not sure', true),
-                new StringSchema('letter_salutation', 'e.g. Sehr geehrter Herr Eris, Dear Mr..., etc.', true),
             ],
         );
 
@@ -49,6 +48,8 @@ class KontaktSplitter extends Component
                 ->asStructured();
 
             $structuredResponse = $response->structured;
+
+            $structuredResponse['letter_salutation'] = $this->generateLetterSalutation($this->structuredResponse);
 
             return $structuredResponse;
         } catch (Exception $e) {
@@ -79,5 +80,86 @@ class KontaktSplitter extends Component
             ->create($this->structured);
 
         session()->flash('status', 'Briefanrede wurde gespeichert!');
+    }
+
+    /*
+    * Generates the letter salutation based on the structured data when lastname and salutation are set
+    */
+    public static function generateLetterSalutation(array $structured): string
+    {
+        if ($structured and isset($structured['lastname']) and isset($structured['salutation'])) {
+            if (isset($structured['language'])) {
+                if ($structured['language'] === 'DE') {
+                    if (isset($structured['gender'])) {
+                        if ($structured['gender'] == 'male') {
+                            $greeting = 'Sehr geehrter';
+                        } else {
+                            $greeting = 'Sehr geehrte';
+                        }
+                    } else {
+                        $greeting = 'Sehr geehrte Damen und Herren';
+                    }
+                } elseif ($structured['language'] === 'EN') {
+                    if (isset($structured['gender'])) {
+                        if ($structured['gender'] == 'male') {
+                            $greeting = 'Dear Mr.';
+                        } else {
+                            $greeting = 'Dear Mrs.';
+                        }
+                    } else {
+                        $greeting = 'Dear Sirs';
+                    }
+                } elseif ($structured['language'] === 'IT') {
+                    if (isset($structured['gender'])) {
+                        if ($structured['gender'] == 'male') {
+                            $greeting = 'Egregio Signor';
+                        } else {
+                            $greeting = 'Gentile Signora';
+                        }
+                    } else {
+                        $greeting = 'Egregi Signori';
+                    }
+                } elseif ($structured['language'] === 'FR') {
+                    if (isset($structured['gender'])) {
+                        if ($structured['gender'] == 'male') {
+                            $greeting = 'Monsieur';
+                        } else {
+                            $greeting = 'Madame';
+                        }
+                    } else {
+                        $greeting = 'Messiersdames';
+                    }
+                } elseif ($structured['language'] === 'ES') {
+                    if (isset($structured['gender'])) {
+                        if ($structured['gender'] == 'male') {
+                            $greeting = 'Estimado Señor';
+                        } else {
+                            $greeting = 'Estimada Señora';
+                        }
+                    } else {
+                        $greeting = 'Estimados Señores y Señoras';
+                    }
+                }
+            } else {
+                // Default country is germany
+                if (isset($structured['gender'])) {
+                    if ($structured['gender'] == 'male') {
+                        $greeting = 'Sehr geehrter';
+                    } else {
+                        $greeting = 'Sehr geehrte';
+                    }
+                } else {
+                    $greeting = 'Sehr geehrte Damen und Herren';
+                }
+
+            }
+            if (isset($structured['title'])) {
+                return "$greeting ".$structured['salutation'].' '.$structured['title'].' '.$structured['lastname'];
+            } else {
+                return "$greeting ".$structured['salutation'].' '.$structured['lastname'];
+            }
+        }
+
+        return 'Sehr geehrte Damen und Herren';
     }
 }
