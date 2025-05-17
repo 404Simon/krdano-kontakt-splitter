@@ -3,12 +3,18 @@
 namespace App\Livewire;
 
 use Exception;
+use GenderDetector\Gender;
+use GenderDetector\GenderDetector;
 use Illuminate\Support\Facades\Log;
+use LanguageDetection\Language;
 use Livewire\Component;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Prism;
 use Prism\Prism\Schema\ObjectSchema;
 use Prism\Prism\Schema\StringSchema;
+use TheIconic\NameParser\Language\English;
+use TheIconic\NameParser\Language\German;
+use TheIconic\NameParser\Parser;
 
 class KontaktSplitter extends Component
 {
@@ -25,7 +31,7 @@ class KontaktSplitter extends Component
         ],
     ];
 
-    public function retrieveDetails(string $input)
+    public function retrieveDetailsByAI(string $input)
     {
         $schema = new ObjectSchema(
             name: 'person',
@@ -42,14 +48,14 @@ class KontaktSplitter extends Component
 
         try {
             $response = Prism::structured()
-                ->using(Provider::OpenAI, 'gpt-4o-mini')
+                ->using(Provider::DeepSeek, 'deepseek-chat')
                 ->withSchema($schema)
                 ->withPrompt($input)
                 ->asStructured();
 
             $structuredResponse = $response->structured;
 
-            $structuredResponse['letter_salutation'] = $this->generateLetterSalutation($this->structuredResponse);
+            $structuredResponse['letter_salutation'] = $this->generateLetterSalutation($structuredResponse);
 
             return $structuredResponse;
         } catch (Exception $e) {
@@ -80,6 +86,117 @@ class KontaktSplitter extends Component
             ->create($this->structured);
 
         session()->flash('status', 'Briefanrede wurde gespeichert!');
+    }
+
+    public function reevaluateUsingAI(): void
+    {
+        $this->validateOnly('unstructured');
+        try {
+            $this->structured = $this->retrieveDetailsByAI($this->unstructured);
+        } catch (Exception $th) {
+            $this->structured = null;
+        }
+    }
+
+    public function retrieveDetails(string $input): ?array
+    {
+        try {
+            $parser = new Parser([
+                new German, // default
+                new English,
+            ]);
+
+            $name = $parser->parse($input);
+
+            $parsedSalutation = $name->getSalutation();
+            $firstname = $name->getFirstname();
+            if ($name->getMiddlename()) {
+                $firstname = $firstname.' '.$name->getMiddlename();
+            }
+            $lastname = $name->getLastname(); // Includes prefixes like von, de etc.
+
+            $estimatedGender = null;
+            $estimatedLanguage = null;
+            $derivedSalutation = null;
+
+            $lowerParsedSalutation = strtolower($parsedSalutation);
+
+            // Heuristic: Prioritize gender from the parsed salutation
+            if (in_array($lowerParsedSalutation, ['herr', 'mr', 'señor', 'sr'])) {
+                $estimatedGender = 'male';
+            } elseif (in_array($lowerParsedSalutation, ['frau', 'mrs', 'ms', 'señora', 'sra'])) {
+                $estimatedGender = 'female';
+            }
+
+            // Heuristic: Initial language estimation based *only* on parsed salutation
+            if (in_array($lowerParsedSalutation, ['herr', 'frau'])) {
+                $estimatedLanguage = 'DE';
+            } elseif (in_array($lowerParsedSalutation, ['mr.', 'mrs.', 'ms.'])) {
+                $estimatedLanguage = 'EN';
+            } elseif (in_array($lowerParsedSalutation, ['señor', 'señora', 'sr.', 'sra.'])) {
+                $estimatedLanguage = 'ES'; // Spanish example
+            }
+
+            $detectedGender = new GenderDetector()->getGender($firstname);
+
+            $estimatedGender = "male";
+            if($detectedGender && in_array($detectedGender, [Gender::Female, Gender::MostlyFemale]))
+            {
+                $estimatedGender = "female";
+            }
+
+            // Heuristic: Derive a salutation if the parser didn't find one, but we estimated gender
+            if (empty($parsedSalutation) && $estimatedGender !== null) {
+                $langForDerivedSalutation = $estimatedLanguage ?? 'DE'; // Default to DE
+
+                if ($estimatedGender === 'male') {
+                    if ($langForDerivedSalutation === 'EN') {
+                        $derivedSalutation = 'Mr.';
+                    } elseif ($langForDerivedSalutation === 'ES') {
+                        $derivedSalutation = 'Sr.';
+                    } else {
+                        $derivedSalutation = 'Herr';
+                    } // Default German
+                } elseif ($estimatedGender === 'female') {
+                    if ($langForDerivedSalutation === 'EN') {
+                        $derivedSalutation = 'Ms.';
+                    } elseif ($langForDerivedSalutation === 'ES') {
+                        $derivedSalutation = 'Sra.';
+                    } else {
+                        $derivedSalutation = 'Frau';
+                    } // Default German
+                }
+
+                // if salutation is derived, ensure language field reflects it
+                if (! empty($derivedSalutation)) {
+                    if (in_array($derivedSalutation, ['Herr', 'Frau'])) {
+                        $estimatedLanguage = 'DE';
+                    } elseif (in_array($derivedSalutation, ['Mr.', 'Ms.'])) {
+                        $estimatedLanguage = 'EN';
+                    } elseif (in_array($derivedSalutation, ['Sr.', 'Sra.'])) {
+                        $estimatedLanguage = 'ES';
+                    }
+                }
+            }
+
+            $structuredResponse = [
+                'salutation' => ! empty($parsedSalutation) ? $parsedSalutation : $derivedSalutation,
+                'title' => null, // The parser includes titles in Salutation, doesn't separate them.
+                'gender' => $estimatedGender,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'language' => $estimatedLanguage,
+            ];
+
+            $structuredResponse['letter_salutation'] = $this->generateLetterSalutation($structuredResponse);
+
+            return $structuredResponse;
+
+        } catch (\Exception $e) {
+            Log::error('Failed to extract data from:'.$input.'. Error: '.$e->getMessage());
+
+            return null;
+        }
     }
 
     /*
@@ -132,9 +249,9 @@ class KontaktSplitter extends Component
                 } elseif ($structured['language'] === 'ES') {
                     if (isset($structured['gender'])) {
                         if ($structured['gender'] == 'male') {
-                            $greeting = 'Estimado Señor';
+                            $greeting = 'Estimado';
                         } else {
-                            $greeting = 'Estimada Señora';
+                            $greeting = 'Estimada';
                         }
                     } else {
                         $greeting = 'Estimados Señores y Señoras';

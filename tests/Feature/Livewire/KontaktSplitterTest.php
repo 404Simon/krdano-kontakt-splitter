@@ -54,7 +54,7 @@ class KontaktSplitterTest extends TestCase
                 'lastname' => 'Pérez',
                 'gender' => 'male',
                 'language' => 'ES',
-            ], 'Estimado Señor Juan Pérez'],
+            ], 'Estimado Señor Pérez'],
         ];
     }
 }

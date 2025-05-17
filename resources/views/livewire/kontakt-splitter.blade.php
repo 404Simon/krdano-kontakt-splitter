@@ -1,10 +1,13 @@
 <div class="p-4 space-y-4 mx-4 md:mx-30 my-10">
-    <form wire:submit="submit">
-        <x-input class="text-black" label="Unstructured Input" hint="Insert your unstructured input"
-            wire:model.defer="unstructured" />
-        <x-button type="submit">Submit</x-button>
-    </form>
-
+    <div>
+        <form wire:submit="submit" class="flex items-end space-x-2">
+            <div class="flex-1">
+                <x-input class="text-black w-full" label="Unstructured Input" hint="Insert your unstructured input"
+                    wire:model.defer="unstructured" />
+            </div>
+            <x-button type="submit">Analysieren</x-button>
+        </form>
+    </div>
     @isset($structured)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -48,6 +51,7 @@
                 <div class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ $structured['letter_salutation'] ?? '–' }}</div>
             </div>
+            <x-button wire:click="reevaluateUsingAI" type="button">Use AI</x-button>
             <x-button wire:click="save" type="button">Speichern</x-button>
             @if (session('status'))
                 <div class="alert alert-success">
