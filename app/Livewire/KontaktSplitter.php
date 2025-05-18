@@ -45,8 +45,7 @@ class KontaktSplitter extends Component
 
     public function generateLetterSalutation()
     {
-        $structured = $this->structured;
-        $this->letterSalutation = LetterSalutationService::generate($structured);
+        $this->letterSalutation = LetterSalutationService::generate($this->structured);
     }
 
     public function reevaluateUsingAI(AIService $aiService, LetterSalutationService $letterSalutationService): void
