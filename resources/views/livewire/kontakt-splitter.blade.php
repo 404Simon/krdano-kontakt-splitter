@@ -44,7 +44,8 @@
                 </div>
             </div>
         </div>
-        <flux:textarea wire:model="structured.letter_salutation" :label="__('Briefanrede')" rows="auto" />
+        <flux:separator />
+        <flux:textarea wire:model="letterSalutation" :label="__('Briefanrede')" rows="auto" />
         <x-button icon="circle-stack" wire:click="save" type="button">Speichern</x-button>
         @if (session('status'))
             <flux:callout variant="secondary" icon="information-circle" heading="{{ session('status') }}" />
