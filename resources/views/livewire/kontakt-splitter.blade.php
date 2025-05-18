@@ -1,63 +1,53 @@
-<div class="p-4 space-y-4 mx-4 md:mx-30 my-10">
-    <div>
-        <form wire:submit="submit" class="flex items-end space-x-2">
-            <div class="flex-1">
-                <x-input class="text-black w-full" label="Unstructured Input" hint="Insert your unstructured input"
-                    wire:model.defer="unstructured" />
-            </div>
-            <x-button type="submit">Analysieren</x-button>
-        </form>
+<div class="p-4 space-y-4 mx-4 md:mx-20 my-10">
+    <div class="flex items-end space-x-2">
+        <div class="flex-1">
+            <x-input label="Unstrukturierter Input" wire:model.live="unstructured" autofocus />
+        </div>
+        <div>
+            <x-button icon="sparkles" wire:click="reevaluateUsingAI" type="button" :disabled="!$this->unstructured">
+                Use AI
+            </x-button>
+        </div>
     </div>
     @isset($structured)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            {{-- left column: raw data --}}
-            <div class="space-y-1">
-                @isset($structured['salutation'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Anrede: <span class="font-semibold">{{ $structured['salutation'] }}</span>
-                    </div>
-                @endisset
-                @isset($structured['title'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Titel: <span class="font-semibold">{{ $structured['title'] }}</span>
-                    </div>
-                @endisset
-                @isset($structured['gender'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Geschlecht: <span class="font-semibold">{{ $structured['gender'] }}</span>
-                    </div>
-                @endisset
-                @isset($structured['firstname'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Vorname: <span class="font-semibold">{{ $structured['firstname'] }}</span>
-                    </div>
-                @endisset
-                @isset($structured['lastname'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Nachname: <span class="font-semibold">{{ $structured['lastname'] }}</span>
-                    </div>
-                @endisset
-                @isset($structured['language'])
-                    <div class="text-gray-700 dark:text-gray-200">
-                        Sprache: <span class="font-semibold">{{ $structured['language'] }}</span>
-                    </div>
-                @endisset
-            </div>
-
-            {{-- right column: formatted display --}}
-            <div class="space-y-1">
-                <div class="text-sm text-gray-600 dark:text-gray-400">Briefanrede:</div>
-                <div class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ $structured['letter_salutation'] ?? '–' }}</div>
-            </div>
-            <x-button wire:click="reevaluateUsingAI" type="button">Use AI</x-button>
-            <x-button wire:click="save" type="button">Speichern</x-button>
-            @if (session('status'))
-                <div class="alert alert-success">
-                    {{ session('status') }}
+            <div class="space-y-2">
+                <div>
+                    <flux:input wire:model.debounce.500ms="structured.salutation" :label="__('Anrede')" type="text" />
                 </div>
-            @endif
+                <div>
+                    <flux:input wire:model.debounce.500ms="structured.title" :label="__('Titel')" type="text" />
+                </div>
+                <div>
+                    <flux:select wire:model="structured.gender" :placeholder="__('Geschlecht')" :label="__('Geschlecht')">
+                        <flux:select.option value="male">Mann</flux:select.option>
+                        <flux:select.option value="female">Frau</flux:select.option>
+                    </flux:select>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div>
+                    <flux:input wire:model.debounce.500ms="structured.firstname" :label="__('Vorname')" type="text" />
+                </div>
+                <div>
+                    <flux:input wire:model.live.debounce.500ms="structured.lastname" :label="__('Nachname')"
+                        type="text" />
+                </div>
+                <div>
+                    <flux:select wire:model="structured.language" :placeholder="__('Sprache')" :label="__('Sprache')">
+                        <flux:select.option value="DE">Deutsch</flux:select.option>
+                        <flux:select.option value="EN">Englisch</flux:select.option>
+                        <flux:select.option value="ES">Spanisch</flux:select.option>
+                        <flux:select.option value="IT">Italienisch</flux:select.option>
+                        <flux:select.option value="FR">Französisch</flux:select.option>
+                    </flux:select>
+                </div>
+            </div>
         </div>
+        <flux:textarea wire:model="structured.letter_salutation" :label="__('Briefanrede')" rows="auto" />
+        <x-button icon="circle-stack" wire:click="save" type="button">Speichern</x-button>
+        @if (session('status'))
+            <flux:callout variant="secondary" icon="information-circle" heading="{{ session('status') }}" />
+        @endif
     @endisset
 </div>

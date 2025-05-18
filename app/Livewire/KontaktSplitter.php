@@ -24,7 +24,7 @@ class KontaktSplitter extends Component
 
     protected array $rules = [
         'unstructured' => [
-            'required',
+            // 'required',
             // 'string',
             // 'not_regex:/[a-zA-Z]/',
             // 'regex:/^[0-9+\-\s()]+$/',
@@ -65,16 +65,6 @@ class KontaktSplitter extends Component
         }
     }
 
-    public function submit(): void
-    {
-        $this->validateOnly('unstructured');
-        try {
-            $this->structured = $this->retrieveDetails($this->unstructured);
-        } catch (Exception $th) {
-            $this->structured = null;
-        }
-    }
-
     public function save(): void
     {
         if (! $this->structured) {
@@ -91,6 +81,11 @@ class KontaktSplitter extends Component
     public function reevaluateUsingAI(): void
     {
         $this->validateOnly('unstructured');
+        if(! $this->unstructured)
+        {
+            $this->structured = null;
+            return;
+        }
         try {
             $this->structured = $this->retrieveDetailsByAI($this->unstructured);
         } catch (Exception $th) {
@@ -278,5 +273,28 @@ class KontaktSplitter extends Component
         }
 
         return 'Sehr geehrte Damen und Herren';
+    }
+
+    public function updatedStructured()
+    {
+        if($this->structured)
+        {
+            $this->structured['letter_salutation'] = $this->generateLetterSalutation($this->structured);
+        }
+    }
+
+    public function updatedunstructured()
+    {
+        $this->validateOnly('unstructured');
+        if(!$this->unstructured)
+        {
+            $this->structured = null;
+            return;
+        }
+        try {
+            $this->structured = $this->retrieveDetails($this->unstructured);
+        } catch (Exception $th) {
+            $this->structured = null;
+        }
     }
 }
