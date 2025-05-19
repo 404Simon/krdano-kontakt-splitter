@@ -4,84 +4,51 @@ namespace App\Services;
 
 class LetterSalutationService
 {
+    public static array $languageGreeting = [
+        'DE' => ['Sehr geehrter', 'Sehr geehrte', 'Sehr geehrte Damen und Herren'],
+        'EN' => ['Dear', 'Dear', 'Dear Sirs'],
+        'IT' => ['Egregio', 'Gentile', 'Egregi Signori'],
+        'FR' => ['', '', 'Messiersdames'],
+        'ES' => ['Estimado', 'Estimada', 'Estimados Señores y Señoras'],
+    ];
+
+    // Default country is germany
+    public static string $defaultLanguage = 'DE';
+
     /*
-    * Generates the letter salutation based on the structured data when lastname and salutation are set
+    * Generates the letter salutation based on the structured data
     */
     public static function generate(array $structured): string
     {
-        if ($structured and isset($structured['lastname']) and isset($structured['salutation'])) {
-            if (isset($structured['language'])) {
-                if ($structured['language'] === 'DE') {
-                    if (isset($structured['gender'])) {
-                        if ($structured['gender'] == 'male') {
-                            $greeting = 'Sehr geehrter';
-                        } else {
-                            $greeting = 'Sehr geehrte';
-                        }
-                    } else {
-                        $greeting = 'Sehr geehrte Damen und Herren';
-                    }
-                } elseif ($structured['language'] === 'EN') {
-                    if (isset($structured['gender'])) {
-                        if ($structured['gender'] == 'male') {
-                            $greeting = 'Dear Mr.';
-                        } else {
-                            $greeting = 'Dear Mrs.';
-                        }
-                    } else {
-                        $greeting = 'Dear Sirs';
-                    }
-                } elseif ($structured['language'] === 'IT') {
-                    if (isset($structured['gender'])) {
-                        if ($structured['gender'] == 'male') {
-                            $greeting = 'Egregio Signor';
-                        } else {
-                            $greeting = 'Gentile Signora';
-                        }
-                    } else {
-                        $greeting = 'Egregi Signori';
-                    }
-                } elseif ($structured['language'] === 'FR') {
-                    if (isset($structured['gender'])) {
-                        if ($structured['gender'] == 'male') {
-                            $greeting = 'Monsieur';
-                        } else {
-                            $greeting = 'Madame';
-                        }
-                    } else {
-                        $greeting = 'Messiersdames';
-                    }
-                } elseif ($structured['language'] === 'ES') {
-                    if (isset($structured['gender'])) {
-                        if ($structured['gender'] == 'male') {
-                            $greeting = 'Estimado';
-                        } else {
-                            $greeting = 'Estimada';
-                        }
-                    } else {
-                        $greeting = 'Estimados Señores y Señoras';
-                    }
+        if ($structured) {
+            if (isset($structured['language']) and isset(self::$languageGreeting[$structured['language']])) {
+                $allGreetings = self::$languageGreeting[$structured['language']];
+            } else {
+                $allGreetings = self::$languageGreeting[self::$defaultLanguage];
+            }
+            if (isset($structured['gender'])) {
+                if ($structured['gender'] == 'male') {
+                    $greeting = $allGreetings[0];
+                } else {
+                    $greeting = $allGreetings[1];
                 }
             } else {
-                // Default country is germany
-                if (isset($structured['gender'])) {
-                    if ($structured['gender'] == 'male') {
-                        $greeting = 'Sehr geehrter';
-                    } else {
-                        $greeting = 'Sehr geehrte';
-                    }
-                } else {
-                    $greeting = 'Sehr geehrte Damen und Herren';
-                }
-
+                ds('Kein Geschlecht da');
+                $greeting = $allGreetings[2];
+            }
+            if (isset($structured['salutation'])) {
+                $greeting = $greeting.' '.$structured['salutation'];
             }
             if (isset($structured['title'])) {
-                return "$greeting ".$structured['salutation'].' '.$structured['title'].' '.$structured['lastname'];
-            } else {
-                return "$greeting ".$structured['salutation'].' '.$structured['lastname'];
+                $greeting = $greeting.' '.$structured['title'];
             }
+            if (isset($structured['lastname'])) {
+                $greeting = $greeting.' '.$structured['lastname'];
+            }
+
+            return $greeting;
         }
 
-        return 'Sehr geehrte Damen und Herren';
+        return self::$languageGreeting[self::$defaultLanguage][2];
     }
 }
