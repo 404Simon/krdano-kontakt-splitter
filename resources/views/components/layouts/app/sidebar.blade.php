@@ -26,9 +26,9 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Dokumentation" expandable>
-                    <flux:navlist.item href="#">User Stories</flux:navlist.item>
-                    <flux:navlist.item href="#">Definition of Done</flux:navlist.item>
-                    <flux:navlist.item href="#">Release Note</flux:navlist.item>
+                    <flux:navlist.item :href="route('docs.stories')">User Stories</flux:navlist.item>
+                    <flux:navlist.item :href="route('docs.dod')">Definition of Done</flux:navlist.item>
+                    <flux:navlist.item :href="route('docs.release')">Release Note</flux:navlist.item>
                 </flux:navlist.group>
                 <flux:navlist.item icon="github" href="https://github.com/404Simon/kontakt-splitter" target="_blank">
                 {{ __('Repository') }}

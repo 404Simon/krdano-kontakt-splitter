@@ -1,7 +1,10 @@
 <?php
 
+use App\Livewire\DefinitionOfDone;
 use App\Livewire\KontaktSplitter;
+use App\Livewire\ReleaseNote;
 use App\Livewire\SavedInputs;
+use App\Livewire\UserStories;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -12,6 +15,11 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('splitter', KontaktSplitter::class)->name('splitter');
     Route::get('saved', SavedInputs::class)->name('saved');
+    Route::prefix('docs')->name('docs.')->group(function () {
+        Route::get('stories', UserStories::class)->name('stories');
+        Route::get('dod', DefinitionOfDone::class)->name('dod');
+        Route::get('release', ReleaseNote::class)->name('release');
+    });
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
