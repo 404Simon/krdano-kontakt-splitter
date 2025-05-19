@@ -11,6 +11,8 @@ use TheIconic\NameParser\Parser;
 
 class KontaktParserService
 {
+    public function __construct(private GenderDetector $genderDetector) {}
+
     public function extractDetails(string $input): ?array
     {
         try {
@@ -50,8 +52,7 @@ class KontaktParserService
                 $estimatedLanguage = 'ES'; // Spanish example
             }
 
-            $genderDetector = new GenderDetector;
-            $detectedGender = $genderDetector->getGender($firstname);
+            $detectedGender = $this->genderDetector->getGender($firstname);
 
             $estimatedGender = 'male';
             if ($detectedGender && in_array($detectedGender, [Gender::Female, Gender::MostlyFemale])) {
