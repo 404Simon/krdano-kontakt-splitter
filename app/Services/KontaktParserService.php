@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Exception;
 use GenderDetector\Gender;
 use GenderDetector\GenderDetector;
 use Illuminate\Support\Facades\Log;
@@ -51,12 +50,12 @@ class KontaktParserService
                 $estimatedLanguage = 'ES'; // Spanish example
             }
 
-            $detectedGender = new GenderDetector()->getGender($firstname);
+            $genderDetector = new GenderDetector;
+            $detectedGender = $genderDetector->getGender($firstname);
 
-            $estimatedGender = "male";
-            if($detectedGender && in_array($detectedGender, [Gender::Female, Gender::MostlyFemale]))
-            {
-                $estimatedGender = "female";
+            $estimatedGender = 'male';
+            if ($detectedGender && in_array($detectedGender, [Gender::Female, Gender::MostlyFemale])) {
+                $estimatedGender = 'female';
             }
 
             // Heuristic: Derive a salutation if the parser didn't find one, but we estimated gender
@@ -101,6 +100,7 @@ class KontaktParserService
                 'lastname' => $lastname,
                 'language' => $estimatedLanguage,
             ];
+
             return $structuredResponse;
 
         } catch (\Exception $e) {
