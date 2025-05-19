@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    return redirect()->route('splitter');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('splitter', KontaktSplitter::class)->name('splitter');

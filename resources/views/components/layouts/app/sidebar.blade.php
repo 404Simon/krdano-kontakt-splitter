@@ -14,20 +14,26 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('splitter')" :current="request()->routeIs('splitter')" wire:navigate>{{ __('Splitter') }}</flux:navlist.item>
-                    <flux:navlist.item icon="home" :href="route('saved')" :current="request()->routeIs('saved')" wire:navigate>{{ __('Saved') }}</flux:navlist.item>
+                    <flux:navlist.item icon="circle-stack" :href="route('saved')" :current="request()->routeIs('saved')" wire:navigate>{{ __('Anreden') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
+
+
+
             <flux:spacer />
 
+
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                <flux:navlist.group heading="Dokumentation" expandable>
+                    <flux:navlist.item href="#">User Stories</flux:navlist.item>
+                    <flux:navlist.item href="#">Definition of Done</flux:navlist.item>
+                    <flux:navlist.item href="#">Release Note</flux:navlist.item>
+                </flux:navlist.group>
+                <flux:navlist.item icon="github" href="https://github.com/404Simon/kontakt-splitter" target="_blank">
                 {{ __('Repository') }}
                 </flux:navlist.item>
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
             </flux:navlist>
 
             <!-- Desktop User Menu -->
