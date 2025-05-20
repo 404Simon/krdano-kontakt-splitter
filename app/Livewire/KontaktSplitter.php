@@ -64,7 +64,7 @@ class KontaktSplitter extends Component
         }
     }
 
-    public function updatedStructured(LetterSalutationService $letterSalutationService)
+    public function updatedStructured($value, $key)
     {
         if ($this->structured) {
             $this->generateLetterSalutation();

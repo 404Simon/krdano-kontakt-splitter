@@ -13,13 +13,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-2">
                 <div>
-                    <flux:input wire:model.debounce.500ms="structured.salutation" :label="__('Anrede')" type="text" />
+                    <flux:input wire:model.live.debounce.200ms="structured.salutation" :label="__('Anrede')"
+                        type="text" />
                 </div>
                 <div>
-                    <flux:input wire:model.debounce.500ms="structured.title" :label="__('Titel')" type="text" />
+                    <flux:input wire:model.live.debounce.200ms="structured.title" :label="__('Titel')" type="text" />
                 </div>
                 <div>
-                    <flux:select wire:model="structured.gender" :placeholder="__('Geschlecht')" :label="__('Geschlecht')">
+                    <flux:select wire:model.live.debounce.200ms="structured.gender" :placeholder="__('Geschlecht')"
+                        :label="__('Geschlecht')">
                         <flux:select.option value="male">Mann</flux:select.option>
                         <flux:select.option value="female">Frau</flux:select.option>
                     </flux:select>
@@ -27,14 +29,16 @@
             </div>
             <div class="space-y-2">
                 <div>
-                    <flux:input wire:model.debounce.500ms="structured.firstname" :label="__('Vorname')" type="text" />
-                </div>
-                <div>
-                    <flux:input wire:model.live.debounce.500ms="structured.lastname" :label="__('Nachname')"
+                    <flux:input wire:model.live.debounce.200ms="structured.firstname" :label="__('Vorname')"
                         type="text" />
                 </div>
                 <div>
-                    <flux:select wire:model="structured.language" :placeholder="__('Sprache')" :label="__('Sprache')">
+                    <flux:input wire:model.live.live.debounce.200ms="structured.lastname" :label="__('Nachname')"
+                        type="text" />
+                </div>
+                <div>
+                    <flux:select wire:model.live.debounce.200ms="structured.language" :placeholder="__('Sprache')"
+                        :label="__('Sprache')">
                         <flux:select.option value="DE">Deutsch</flux:select.option>
                         <flux:select.option value="EN">Englisch</flux:select.option>
                         <flux:select.option value="ES">Spanisch</flux:select.option>
