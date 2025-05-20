@@ -33,11 +33,14 @@ class LetterSalutationService
                     $greeting = $allGreetings[1];
                 }
             } else {
-                ds('Kein Geschlecht da');
                 $greeting = $allGreetings[2];
             }
             if (isset($structured['salutation'])) {
-                $greeting = $greeting.' '.$structured['salutation'];
+                if ($greeting != '') {
+                    $greeting = $greeting.' '.$structured['salutation'];
+                } else {
+                    $greeting = $structured['salutation'];
+                }
             }
             if (isset($structured['title'])) {
                 $greeting = $greeting.' '.$structured['title'];
