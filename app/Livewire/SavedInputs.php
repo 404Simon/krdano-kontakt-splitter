@@ -3,23 +3,22 @@
 namespace App\Livewire;
 
 use App\Models\SavedInput;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class SavedInputs extends Component
 {
-    public Collection $savedInputs;
-
-    public function mount()
+    #[Computed]
+    public function savedInputs()
     {
-        $this->savedInputs = auth()->user()->savedInputs;
+        return Auth::user()->savedInputs;
     }
 
     public function delete(SavedInput $input)
     {
-        if ($input->user_id === auth()->user()->id) {
+        if ($input->user_id === Auth::user()->id) {
             $input->delete();
-            $this->savedInputs = auth()->user()->savedInputs;
         }
     }
 }
