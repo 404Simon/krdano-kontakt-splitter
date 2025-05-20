@@ -7,6 +7,7 @@ use App\Services\KontaktParserService;
 use App\Services\LetterSalutationService;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class KontaktSplitter extends Component
@@ -36,7 +37,7 @@ class KontaktSplitter extends Component
         ], [], [
             'letterSalutation' => 'Letter Salutation',
         ]);
-        auth()->user()
+        Auth::user()
             ->savedInputs()
             ->create(Arr::add($this->structured, 'letter_salutation', $this->letterSalutation));
 
