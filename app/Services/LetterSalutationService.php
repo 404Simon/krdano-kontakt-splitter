@@ -4,27 +4,18 @@ namespace App\Services;
 
 class LetterSalutationService
 {
-    public static array $languageGreeting = [
-        'DE' => ['Sehr geehrter', 'Sehr geehrte', 'Sehr geehrte Damen und Herren'],
-        'EN' => ['Dear', 'Dear', 'Dear Sirs'],
-        'IT' => ['Egregio', 'Gentile', 'Egregi Signori'],
-        'FR' => ['', '', 'Messiersdames'],
-        'ES' => ['Estimado', 'Estimada', 'Estimados Señores y Señoras'],
-    ];
-
-    // Default country is germany
-    public static string $defaultLanguage = 'DE';
-
     /*
     * Generates the letter salutation based on the structured data
     */
     public static function generate(array $structured): string
     {
+        $languageGreeting = config('languages.greetings');
+        $defaultLanguage = config('languages.default_language');
         if ($structured) {
-            if (isset($structured['language']) and isset(self::$languageGreeting[$structured['language']])) {
-                $allGreetings = self::$languageGreeting[$structured['language']];
+            if (isset($structured['language']) and isset($languageGreeting[$structured['language']])) {
+                $allGreetings = $languageGreeting[$structured['language']];
             } else {
-                $allGreetings = self::$languageGreeting[self::$defaultLanguage];
+                $allGreetings = $languageGreeting[$defaultLanguage];
             }
             if (isset($structured['gender'])) {
                 if ($structured['gender'] == 'male') {
@@ -52,6 +43,6 @@ class LetterSalutationService
             return $greeting;
         }
 
-        return self::$languageGreeting[self::$defaultLanguage][2];
+        return $languageGreeting[$defaultLanguage][2];
     }
 }

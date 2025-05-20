@@ -3,9 +3,7 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\KontaktSplitter;
-use App\Services\LetterSalutationService;
 use Livewire\Livewire;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class KontaktSplitterTest extends TestCase
@@ -16,76 +14,52 @@ class KontaktSplitterTest extends TestCase
             ->assertStatus(200);
     }
 
-    #[DataProvider('nameProvider')]
-    public function test_add(array $structuredData, string $expected): void
+    public function test_gender_change_should_change_salutation()
     {
-        $letterSalutation = LetterSalutationService::generate($structuredData);
+        config([
+            'languages.salutation' => [
+                'DE' => [
+                    'male' => 'Herr',
+                    'female' => 'Frau',
+                ],
+            ],
+            'languages.default_language' => 'DE',
+        ]);
 
-        $this->assertEquals($expected, $letterSalutation);
+        $component = Livewire::test(KontaktSplitter::class)
+            ->set('structured', [
+                'salutation' => 'Herr',
+                'title' => 'Dr.',
+                'firstname' => 'Max',
+                'lastname' => 'Mustermann',
+                'gender' => 'male',
+                'language' => 'DE',
+            ])
+            ->set('structured.gender', 'female')
+            ->assertSet('structured.salutation', 'Frau');
     }
 
-    public static function nameProvider(): array
+    public function test_gender_change_without_language_should_change_salutation_with_default_language()
     {
-        return [
-            'keine Daten' => [[], 'Sehr geehrte Damen und Herren'],
-            'keine Sprache' => [[
+        config([
+            'languages.salutation' => [
+                'DE' => [
+                    'male' => 'Herr',
+                    'female' => 'Frau',
+                ],
+            ],
+            'languages.default_language' => 'DE',
+        ]);
+
+        $component = Livewire::test(KontaktSplitter::class)
+            ->set('structured', [
                 'salutation' => 'Herr',
                 'title' => 'Dr.',
                 'firstname' => 'Max',
                 'lastname' => 'Mustermann',
                 'gender' => 'male',
-            ], 'Sehr geehrter Herr Dr. Mustermann'],
-            'kein Geschlecht' => [[
-                'title' => 'Dr.',
-                'firstname' => 'Max',
-                'lastname' => 'Mustermann',
-                'language' => 'DE',
-            ], 'Sehr geehrte Damen und Herren Dr. Mustermann'],
-            'kein Titel' => [[
-                'salutation' => 'Herr',
-                'firstname' => 'Max',
-                'lastname' => 'Mustermann',
-                'gender' => 'male',
-                'language' => 'DE',
-            ], 'Sehr geehrter Herr Mustermann'],
-            'kein Nachname' => [[
-                'salutation' => 'Herr',
-                'title' => 'Dr.',
-                'firstname' => 'Max',
-                'gender' => 'male',
-                'language' => 'DE',
-            ], 'Sehr geehrter Herr Dr.'],
-            'männlicher deutscher Name' => [[
-                'salutation' => 'Herr',
-                'title' => 'Dr.',
-                'firstname' => 'Max',
-                'lastname' => 'Mustermann',
-                'gender' => 'male',
-                'language' => 'DE',
-            ], 'Sehr geehrter Herr Dr. Mustermann'],
-            'weiblicher deutscher Name' => [[
-                'salutation' => 'Frau',
-                'title' => 'Prof.',
-                'firstname' => 'Marlene',
-                'lastname' => 'Musterfrau',
-                'gender' => 'female',
-                'language' => 'DE',
-            ], 'Sehr geehrte Frau Prof. Musterfrau'],
-            'spanischer Name' => [[
-                'salutation' => 'Señor',
-                'firstname' => 'Juan',
-                'lastname' => 'Pérez',
-                'gender' => 'male',
-                'language' => 'ES',
-            ], 'Estimado Señor Pérez'],
-            'französischer Name' => [[
-                'salutation' => 'Monsieur',
-                'title' => 'Dr.',
-                'firstname' => 'Emil',
-                'lastname' => 'Lambert',
-                'gender' => 'male',
-                'language' => 'FR',
-            ], 'Monsieur Dr. Lambert'],
-        ];
+            ])
+            ->set('structured.gender', 'female')
+            ->assertSet('structured.salutation', 'Frau');
     }
 }

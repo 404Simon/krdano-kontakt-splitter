@@ -68,6 +68,14 @@ class KontaktSplitter extends Component
     public function updatedStructured($value, $key)
     {
         if ($this->structured) {
+            if ($key === 'gender') {
+                if (isset($this->structured['language'])) {
+                    $salutations = config('languages.salutation')[$this->structured['language']];
+                } else {
+                    $salutations = config('languages.salutation')[config('languages.default_language')];
+                }
+                $this->structured['salutation'] = $salutations[$value];
+            }
             $this->generateLetterSalutation();
         }
     }
