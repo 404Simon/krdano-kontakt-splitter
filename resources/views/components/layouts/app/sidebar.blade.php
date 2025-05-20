@@ -15,6 +15,7 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('splitter')" :current="request()->routeIs('splitter')" wire:navigate>{{ __('Splitter') }}</flux:navlist.item>
                     <flux:navlist.item icon="circle-stack" :href="route('saved')" :current="request()->routeIs('saved')" wire:navigate>{{ __('Anreden') }}</flux:navlist.item>
+                    <flux:navlist.item icon="academic-cap" :href="route('titles')" :current="request()->routeIs('titles')" wire:navigate>{{ __('Titel') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 

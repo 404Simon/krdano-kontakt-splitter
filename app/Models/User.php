@@ -63,4 +63,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SavedInput::class);
     }
+
+    public function supportedTitles(): HasMany
+    {
+        return $this->hasMany(SupportedTitle::class);
+    }
 }
