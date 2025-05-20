@@ -36,7 +36,7 @@ class SupportedTitles extends Component
     {
         $this->validate();
 
-        Auth::user()->supportedTitles()->create(['title' => $this->newTitle]);
+        Auth::user()->supportedTitles()->create(['title' => $this->pull('newTitle')]);
         Flux::modal('new-title')->close();
     }
 
