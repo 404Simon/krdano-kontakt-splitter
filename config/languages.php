@@ -20,6 +20,15 @@ return [
         'ES' => ['male' => 'Señor', 'female' => 'Señora'],
     ],
 
+    'specialSalutationVariations' => [
+        'fräulein' => ['DE', 'female'],
+        'miss' => ['EN', 'female'],
+        'mrs' => ['EN', 'female'],
+        'sir' => ['EN', 'male'],
+        'lady' => ['EN', 'female'],
+        'mademoiselle' => ['FR', 'female'],
+    ],
+
     // Default language
     'default_language' => 'DE',
 
