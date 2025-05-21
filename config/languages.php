@@ -31,5 +31,5 @@ return [
 
     // Default language
     'default_language' => 'DE',
-
+    'lastname_prefixes' => ['von', 'van'],
 ];
