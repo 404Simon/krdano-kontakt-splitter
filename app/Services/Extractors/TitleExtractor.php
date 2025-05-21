@@ -14,28 +14,19 @@ class TitleExtractor
 
     public function __invoke(array $data, Closure $next): array
     {
-        $words = explode(' ', $data['remaining']);
-        $titles = [];
-        $remainingWords = [];
-        $titlePhase = true;
+        $words = collect(explode(' ', trim($data['remaining'])))
+            ->filter(fn ($word) => ! empty($word));
 
-        foreach ($words as $word) {
-            $wordLower = strtolower(rtrim($word, '.'));
+        $titleEndIndex = $words->search(function ($word) {
+            $normalized = strtolower(rtrim($word, '.'));
 
-            // Check if word is a title or part of a title pattern
-            if ($titlePhase && (
-                in_array($wordLower, $this->titles) ||
-                // i think this is nice
-                Str::endsWith($word, '.'))) {
-                $titles[] = $word;
-            } else {
-                $titlePhase = false;
-                $remainingWords[] = $word;
-            }
+            return ! in_array($normalized, $this->titles) && ! Str::endsWith($word, '.');
+        });
+
+        if ($titleEndIndex !== false) {
+            $data['titles'] = $words->take($titleEndIndex)->values()->all();
+            $data['remaining'] = $words->skip($titleEndIndex)->implode(' ');
         }
-
-        $data['titles'] = $titles;
-        $data['remaining'] = implode(' ', $remainingWords);
 
         return $next($data);
     }
