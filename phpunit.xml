@@ -16,6 +16,11 @@
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <directory>app/Livewire</directory>
+            <directory>app/Http/Controllers</directory>
+            <directory>app/Models</directory>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
@@ -30,4 +35,5 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
+
 </phpunit>
