@@ -3,30 +3,34 @@
 namespace App\Services\Extractors;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 class TitleExtractor
 {
-    protected array $titles = [
-        'prof', 'professor', 'dr', 'doctor', 'dipl', 'diplom', 'ing',
-        'doc', 'rer', 'nat', 'med', 'phil', 'h.c', 'msc', 'ma', 'ba', 'phd',
-    ];
-
     public function __invoke(array $data, Closure $next): array
     {
+        $user = Auth::user();
+        $titles = collect(Config::get('languages.defaultSupportedTitles'))
+            ->merge($user ? $user->supportedTitles->pluck('title') : [])
+            ->map(fn ($t) => (string) str($t)->lower()->rtrim('.'))
+            ->unique();
+
         $words = collect(explode(' ', trim($data['remaining'])))
-            ->filter(fn ($word) => ! empty($word));
+            ->filter()
+            ->values();
 
-        $titleEndIndex = $words->search(function ($word) {
-            $normalized = strtolower(rtrim($word, '.'));
+        // Find first word that is NOT a title and doesn't end with a dot
+        $cut = $words->search(fn ($word) => ! $titles->contains(strtolower(rtrim($word, '.')))
+            && ! Str::endsWith($word, '.')
+        );
 
-            return ! in_array($normalized, $this->titles) && ! Str::endsWith($word, '.');
-        });
+        // If none found, consume all as titles
+        $cut = $cut === false ? $words->count() : $cut;
 
-        if ($titleEndIndex !== false) {
-            $data['titles'] = $words->take($titleEndIndex)->values()->all();
-            $data['remaining'] = $words->skip($titleEndIndex)->implode(' ');
-        }
+        $data['titles'] = $words->take($cut)->values()->all();
+        $data['remaining'] = $words->skip($cut)->implode(' ');
 
         return $next($data);
     }

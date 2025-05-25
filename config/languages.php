@@ -31,5 +31,10 @@ return [
 
     // Default language
     'default_language' => 'DE',
-    'lastname_prefixes' => ['von', 'van'],
+    'lastname_prefixes' => ['von', 'van', 'zu'],
+    'defaultSupportedTitles' => [
+        'prof', 'professor', 'dr', 'doctor', 'dipl',
+        'diplom', 'ing', 'doc', 'rer', 'nat', 'med',
+        'phil', 'h.c', 'msc', 'ma', 'ba', 'phd',
+    ],
 ];

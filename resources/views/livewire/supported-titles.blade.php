@@ -1,8 +1,14 @@
 <div>
     <flux:heading size="xl">Unterstützte Titel</flux:heading>
+    @php($defaults = config('languages.defaultSupportedTitles', []))
+    <flux:text class="mt-4">
+        Das System unterstützt von Haus aus bereits die Titel
+        {{ implode(', ', $defaults) }}.
+    </flux:text>
     <div class="overflow-x-auto mt-4 max-w-lg">
         @if ($this->titles->isEmpty())
-            <flux:text class="mt-1" variant="strong">Es wurden noch keine unterstützten Titel hinterlegt.</flux:text>
+            <flux:text variant="strong">Es wurden noch keine zusätzlich unterstützte Titel hinterlegt.
+            </flux:text>
         @else
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">

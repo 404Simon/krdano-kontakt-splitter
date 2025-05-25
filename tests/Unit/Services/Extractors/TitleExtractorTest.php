@@ -2,18 +2,31 @@
 
 namespace Tests\Unit\Services\Extractors;
 
+use App\Models\User;
 use App\Services\Extractors\TitleExtractor;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TitleExtractorTest extends TestCase
 {
+    use RefreshDatabase;
+
     private TitleExtractor $titleExtractor;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        Config::set('languages.defaultSupportedTitles', [
+            'prof', 'professor', 'dr', 'doctor', 'dipl',
+            'diplom', 'ing', 'doc', 'rer', 'nat', 'med',
+            'phil', 'h.c', 'msc', 'ma', 'ba', 'phd',
+        ]);
+
         $this->titleExtractor = new TitleExtractor;
     }
 
@@ -26,9 +39,7 @@ class TitleExtractorTest extends TestCase
     ): void {
         $data = ['remaining' => $input];
 
-        $result = ($this->titleExtractor)($data, function ($processedData) {
-            return $processedData;
-        });
+        $result = ($this->titleExtractor)($data, fn ($d) => $d);
 
         $this->assertEquals($expectedTitles, $result['titles'] ?? []);
         $this->assertEquals($expectedRemaining, $result['remaining'] ?? '');
@@ -118,5 +129,47 @@ class TitleExtractorTest extends TestCase
                 'expectedRemaining' => 'John Dr Smith',
             ],
         ];
+    }
+
+    #[Test]
+    public function it_extracts_custom_supported_titles_from_database(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $user->supportedTitles()->create(['title' => 'mister']);
+
+        $data = ['remaining' => 'Mister John Smith'];
+        $result = ($this->titleExtractor)($data, fn ($d) => $d);
+
+        $this->assertEquals(['Mister'], $result['titles'] ?? []);
+        $this->assertEquals('John Smith', $result['remaining'] ?? '');
+    }
+
+    #[Test]
+    public function it_extracts_both_default_and_custom_titles(): void
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $user->supportedTitles()->create(['title' => 'Sir']);
+
+        $data = ['remaining' => 'Sir Prof John Smith'];
+        $result = ($this->titleExtractor)($data, fn ($d) => $d);
+
+        $this->assertEquals(['Sir', 'Prof'], $result['titles'] ?? []);
+        $this->assertEquals('John Smith', $result['remaining'] ?? '');
+    }
+
+    #[Test]
+    public function it_respects_custom_configured_default_titles(): void
+    {
+        Config::set('languages.defaultSupportedTitles', ['AAA', 'BBB']);
+
+        $data = ['remaining' => 'AAA BBB John Smith'];
+        $result = ($this->titleExtractor)($data, fn ($d) => $d);
+
+        $this->assertEquals(['AAA', 'BBB'], $result['titles'] ?? []);
+        $this->assertEquals('John Smith', $result['remaining'] ?? '');
     }
 }
