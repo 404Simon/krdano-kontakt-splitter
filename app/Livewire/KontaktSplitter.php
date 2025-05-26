@@ -49,22 +49,6 @@ class KontaktSplitter extends Component
         $this->letterSalutation = LetterSalutationService::generate($this->structured);
     }
 
-    public function reevaluateUsingAI(AIService $aiService, LetterSalutationService $letterSalutationService): void
-    {
-        $this->validateOnly('unstructured');
-        if (! $this->unstructured) {
-            $this->structured = null;
-
-            return;
-        }
-        try {
-            $this->structured = $aiService->extractDetails($this->unstructured);
-            $this->generateLetterSalutation();
-        } catch (Exception $th) {
-            $this->structured = null;
-        }
-    }
-
     public function updatedStructured($value, $key)
     {
         if ($this->structured) {

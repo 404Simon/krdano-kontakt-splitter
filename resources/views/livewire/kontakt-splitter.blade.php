@@ -3,11 +3,6 @@
         <div class="flex-1">
             <x-input label="Unstrukturierter Input" wire:model.live="unstructured" autofocus />
         </div>
-        <div>
-            <x-button icon="sparkles" wire:click="reevaluateUsingAI" type="button" :disabled="!$this->unstructured">
-                Use AI
-            </x-button>
-        </div>
     </div>
     @isset($structured)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
