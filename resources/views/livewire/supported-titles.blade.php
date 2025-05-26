@@ -48,7 +48,7 @@
                 <flux:heading size="lg">Titel hinzufügen</flux:heading>
             </div>
             <form wire:submit="saveTitle">
-                <flux:input wire:model.defer="newTitle" label="Titel" placeholder="Dr." />
+                <flux:input wire:model.defer="newTitle" label="Titel" placeholder="Dr." autofocus />
                 <div class="flex">
                     <flux:spacer />
 
