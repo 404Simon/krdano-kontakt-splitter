@@ -30,6 +30,7 @@
                     <flux:navlist.item :href="route('docs.stories')" :current="request()->routeIs('docs.stories')">User Stories</flux:navlist.item>
                     <flux:navlist.item :href="route('docs.dod')" :current="request()->routeIs('docs.dod')">Definition of Done</flux:navlist.item>
                     <flux:navlist.item :href="route('docs.release')" :current="request()->routeIs('docs.release')">Release Note</flux:navlist.item>
+                    <flux:navlist.item :href="route('docs.design')" :current="request()->routeIs('docs.design')">Design</flux:navlist.item>
                 </flux:navlist.group>
                 <flux:navlist.item icon="github" href="https://github.com/404Simon/kontakt-splitter" target="_blank">
                 {{ __('Repository') }}

@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\DefinitionOfDone;
+use App\Livewire\Design;
 use App\Livewire\KontaktSplitter;
 use App\Livewire\ReleaseNote;
 use App\Livewire\SavedInputs;
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('stories', UserStories::class)->name('stories');
         Route::get('dod', DefinitionOfDone::class)->name('dod');
         Route::get('release', ReleaseNote::class)->name('release');
+        Route::get('design', Design::class)->name('design');
     });
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');

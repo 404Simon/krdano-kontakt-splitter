@@ -17,6 +17,10 @@
                         </li>
                     @endforeach
                 </ol>
+                <flux:badge 
+                    color="{{ $story['priority'] === 'hoch' ? 'red' : ($story['priority'] === 'mittel' ? 'orange' : 'lime') }}">
+                    {{ ucfirst($story['priority']) }}
+                </flux:badge>
             </div>
         @endforeach
     </div>
