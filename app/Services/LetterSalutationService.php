@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Arr;
+
 class LetterSalutationService
 {
     /*
@@ -9,40 +11,22 @@ class LetterSalutationService
     */
     public static function generate(array $structured): string
     {
-        $languageGreeting = config('languages.greetings');
-        $defaultLanguage = config('languages.default_language');
-        if ($structured) {
-            if (isset($structured['language']) and isset($languageGreeting[$structured['language']])) {
-                $allGreetings = $languageGreeting[$structured['language']];
-            } else {
-                $allGreetings = $languageGreeting[$defaultLanguage];
-            }
-            if (isset($structured['gender'])) {
-                if ($structured['gender'] == 'male') {
-                    $greeting = $allGreetings[0];
-                } else {
-                    $greeting = $allGreetings[1];
-                }
-            } else {
-                $greeting = $allGreetings[2];
-            }
-            if (isset($structured['salutation'])) {
-                if ($greeting != '') {
-                    $greeting = $greeting.' '.$structured['salutation'];
-                } else {
-                    $greeting = $structured['salutation'];
-                }
-            }
-            if (isset($structured['title'])) {
-                $greeting = $greeting.' '.$structured['title'];
-            }
-            if (isset($structured['lastname'])) {
-                $greeting = $greeting.' '.$structured['lastname'];
-            }
+        $greetings = config('languages.greetings');
+        $defaultLang = config('languages.default_language');
+        $lang = Arr::get($structured, 'language', $defaultLang);
+        $prefixes = $greetings[$lang] ?? $greetings[$defaultLang];
 
-            return $greeting;
-        }
+        $prefix = match (Arr::get($structured, 'gender')) {
+            'male' => $prefixes[0],
+            'female' => $prefixes[1],
+            default => $prefixes[2],
+        };
 
-        return $languageGreeting[$defaultLanguage][2];
+        return collect([
+            $prefix,
+            Arr::get($structured, 'salutation'),
+            Arr::get($structured, 'title'),
+            Arr::get($structured, 'lastname'),
+        ])->filter()->join(' ');
     }
 }

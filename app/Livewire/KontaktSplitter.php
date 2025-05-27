@@ -59,6 +59,9 @@ class KontaktSplitter extends Component
                 }
                 $this->structured['salutation'] = $salutations[$value];
             }
+            if ($key === 'language') {
+                $this->structured['salutation'] = config('languages.salutation')[$value][$this->structured['gender']];
+            }
             $this->generateLetterSalutation();
         }
     }
