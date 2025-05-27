@@ -28,7 +28,7 @@
             Tests
         </flux:heading>
         <flux:text class="mt-1">
-            Die Tests befinden sich in dem Ordner <flux:link href="https://github.com/404Simon/krdano-kontakt-splitter/tree/main/tests">tests</flux:link>, die Coverage ist <flux:link href="https://coverage.krdano.wittmann-simon.de/index.html">hier</flux:link> einsehbar.
+            Die Tests befinden sich in dem Ordner <flux:link href="https://github.com/404Simon/krdano-kontakt-splitter/tree/main/tests" target="blank">tests</flux:link>, die Coverage ist <flux:link href="https://coverage.krdano.wittmann-simon.de/index.html" target="blank">hier</flux:link> einsehbar.
         </flux:text>
     </div>
 </div>
