@@ -6,7 +6,7 @@
             Erster Entwurf
         </flux:heading>
         <flux:text class="mt-1">
-            Im ersten Anlauf wurde die komplette Extraktion mit KI realisiert. Diese Entscheidung wurde revidiert um
+            Im ersten Anlauf wurde die komplette Extraktion mit KI realisiert. Diese Entscheidung wurde revidiert, um
             Kosten und Latenz zu vermeiden. Außerdem gab es beim Einsatz der KI Nebeneffekte, wie z.B. die
             Vervollständigung des Vornamens basierend auf dem Nachname für populäre Namen wie z.B. Merkel. Siehe
             <flux:link target="blank"
@@ -17,12 +17,12 @@
             Aktuelle Architektur
         </flux:heading>
         <flux:text class="mt-1">
-            Die Erkennung erfolgt durch String-Parsing. Die Hauptkomponente des Frontends ist der KontaktParser, welcher
-            sowohl auf den KontaktParserService als auch auf den LetterSalutationService zugreift. Der
-            KontaktparserService nutzt den neuen Pipeline-Ansatz aus Laravel 12, um die verschiedenen Schritte der
+            Die Erkennung erfolgt durch String-Parsing. Die Hauptkomponente des Frontends ist der <code>KontaktParser</code>, welcher
+            sowohl auf den <code>KontaktParserService</code> als auch auf den <code>LetterSalutationService</code> zugreift. Der
+            <code>KontaktparserService</code> nutzt den neuen Pipeline-Ansatz aus Laravel 12, um die verschiedenen Schritte der
             Extraktion zu realisieren. Die Extraktion der einzelnen Bestandteile wurde jeweils innerhalb einer
-            Invocable-Klasse, welche eine Pipe-Stage darstellt, realisiert. Dadurch können die einzelnen Schritte besser
-            getestet und gewartet werden. Der LetterSalutationService ist für die Generierung der Briefanrede zuständig.
+            Invocable-Klasse realisiert, welche eine Pipe-Stage darstellt. Dadurch können die einzelnen Schritte besser
+            getestet und gewartet werden. Der <code>LetterSalutationService</code> ist für die Generierung der Briefanrede zuständig.
             Dabei werden die extrahierten Informationen verwendet.
         </flux:text>
         <figure class="mt-8 w-xl mx-auto">
@@ -35,27 +35,27 @@
             </figcaption>
         </figure>
         <flux:text class="mt-4">
-            Es gibt vier verschiedene Pipe-Klasssen. Bei dem SalutationExtractor wird die Anrede extrahiert, wenn
-            vorhanden. Ist eine vorhanden, wird daraus auch die Sprache ermittelt. Der TitleExtractor sucht in der
-            Eingabe nach abgespeicherten Titeln, diese beinhalten Standardtitel sowie benutzerdefinierte Titel. Wenn ein
-            Wort mit einem Punkt endet, wird angenommen, dass es sich um einen Titel handelt. Bei dem NameExtractor wird
-            der Vor- und Nachname extrahiert. Dabei wird automatisch das letzte Wort als Nachname angenommen, außer es
-            werden Einleitungen für einen Adelstitel gefunden. Der GenderExtractor ermittelt das Geschlecht basierend
+            Es gibt vier verschiedene Pipe-Klasssen. Bei dem <code>SalutationExtractor</code> wird die Anrede extrahiert, wenn
+            vorhanden. Ist eine vorhanden, wird daraus auch die Sprache ermittelt. Der <code>TitleExtractor</code> sucht in der
+            Eingabe nach Titeln - Standard- sowie benutzerdefinerte. Wenn ein Wort mit einem Punkt endet, wird angenommen, dass 
+            es sich um einen Titel handelt. Bei dem <code>NameExtractor</code> wird
+            der Vor- und Nachname extrahiert. Dabei wird das letzte Wort als Nachname automatisch angenommen, außer es
+            werden Einleitungen für einen Adelstitel gefunden. Der <code>GenderExtractor</code> ermittelt das Geschlecht basierend
             auf dem Vornamen. Dazu wird eine <flux:link target="blank" href="https://github.com/tuqqu/gender-detector">
                 Library
             </flux:link> verwendet.
         </flux:text>
         <flux:text class="mt-4">
-            Es wird immer versucht einen sinnvollen Output zu generieren, selbst wenn der eingegebene unstrukturierte
+            Es wird immer versucht, eine sinnvolle Ausgabe zu generieren, selbst wenn der eingegebene unstrukturierte
             Text fehlerhaft oder unvollständig ist. Im Notfall werden Defaults verwendet, welche manuell angepasst
-            werden können. Anstelle die Werte in den Klassen hard zu kodieren, werden sie in einer zentralen <flux:link
+            werden können. Anstelle die Werte in den Klassen hard 💀 zu kodieren, werden sie in einer zentralen <flux:link
                 target="blank"
                 href="https://github.com/404Simon/krdano-kontakt-splitter/blob/main/config/languages.php">
                 Konfigurationsdatei</flux:link> abgespeichert. Laravel bietet über die Config-Facade oder die
             config-Helperfunktion Zugriff auf diese Konfiguration.
         </flux:text>
         <flux:text class="mt-4">
-            Zuerst wird ein Output für die unstrukturierte Eingabe generiert, anschließend können die automatisch
+            Zuerst wird eine Ausgabe für die unstrukturierte Eingabe generiert, anschließend können die automatisch
             extrahierten Werte bei Bedarf manuell angepasst werden. Die Anpassungen überschreiben die automatisch
             ermittelten Werte.
         </flux:text>
@@ -68,7 +68,7 @@
             Techstack
         </flux:heading>
         <flux:text class="mt-4">
-            Die Anwendung ist in Laravel, ein PHP-Framework, geschrieben.
+            Die Anwendung ist in Laravel, einem PHP-Framework, geschrieben.
             Die Benutzeroberfläche wurde mit Livewire als Single Page Application (SPA) konzipiert, um eine schnelle und
             reaktive Benutzererfahrung zu bieten. Es werden Tailwind CSS und FluxUI-Komponenten für ein simples und
             responsives Design verwendet. Die Geschäftslogik ist in Service gekapselt, um eine klare Trennung von Logik
