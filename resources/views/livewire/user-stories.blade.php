@@ -4,8 +4,14 @@
     <div class="space-y-6">
         @foreach ($stories as $index => $story)
             <div class="max-w-3xl px-4">
-                <flux:heading wire:model="story.title" class="mt-3" size="lg">
+                <div class="flex items-center gap-2 mt-3">
+                    <flux:heading wire:model="story.title" size="lg">
                     {{ "Story $index: " . $story['title'] }} </flux:heading>
+                    <flux:badge 
+                        color="{{ $story['priority'] === 'hoch' ? 'red' : ($story['priority'] === 'mittel' ? 'orange' : 'lime') }}" size="sm" inset="top bottom">
+                        {{ ucfirst($story['priority']) }}
+                    </flux:badge>
+                </div>
                 <flux:text class="mt-1" variant="strong">
                     {{ $story['description'] }}
                 </flux:text>
@@ -17,10 +23,6 @@
                         </li>
                     @endforeach
                 </ol>
-                <flux:badge 
-                    color="{{ $story['priority'] === 'hoch' ? 'red' : ($story['priority'] === 'mittel' ? 'orange' : 'lime') }}">
-                    {{ ucfirst($story['priority']) }}
-                </flux:badge>
             </div>
         @endforeach
     </div>
