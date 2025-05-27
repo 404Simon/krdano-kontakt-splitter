@@ -167,4 +167,60 @@ class KontaktParserServiceTest extends TestCase
             ],
         ];
     }
+
+    #[Test]
+    public function it_falls_back_to_default_language_when_salutation_map_missing_language(): void
+    {
+        Config::set('language.default_language', 'FR');
+        Config::set('languages.default_language', 'DE');
+        Config::set('languages.salutation', [
+            'DE' => ['male' => 'Herr', 'female' => 'Frau'],
+        ]);
+
+        $real = new GenderDetector;
+        $fake = Mockery::mock($real)
+            ->shouldReceive('getGender')
+            ->once()
+            ->with(Mockery::any())
+            ->andReturn(Gender::Male)
+            ->getMock();
+
+        $this->app->instance(GenderDetector::class, $fake);
+
+        $result = app(KontaktParserService::class)
+            ->extractDetails('John Doe');
+
+        $this->assertSame('Herr', $result['salutation']);
+        $this->assertSame('John', $result['firstname']);
+        $this->assertSame('Doe', $result['lastname']);
+        $this->assertSame('male', $result['gender']);
+        $this->assertSame('FR', $result['language']);
+    }
+
+    #[Test]
+    public function it_uses_male_salutation_if_female_salutation_missing_for_language(): void
+    {
+        Config::set('languages.salutation', [
+            'DE' => ['male' => 'Herr'],
+        ]);
+
+        $real = new GenderDetector;
+        $fake = Mockery::mock($real)
+            ->shouldReceive('getGender')
+            ->once()
+            ->with(Mockery::any())
+            ->andReturn(Gender::Female)
+            ->getMock();
+
+        $this->app->instance(GenderDetector::class, $fake);
+
+        $result = app(KontaktParserService::class)
+            ->extractDetails('Anna Schmidt');
+
+        $this->assertSame('Herr', $result['salutation']);
+        $this->assertSame('Anna', $result['firstname']);
+        $this->assertSame('Schmidt', $result['lastname']);
+        $this->assertSame('female', $result['gender']);
+        $this->assertSame('DE', $result['language']);
+    }
 }

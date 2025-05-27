@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Services\AIService;
 use App\Services\KontaktParserService;
 use App\Services\LetterSalutationService;
 use Exception;
